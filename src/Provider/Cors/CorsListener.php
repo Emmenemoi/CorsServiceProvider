@@ -86,8 +86,20 @@ class CorsListener implements EventSubscriberInterface
             );
         }
 
-        $response->headers->set('Access-Control-Allow-Origin', '*');
-
+		if (!empty($this->app['cors.options']['origins'])) {
+			$origin = $request->headers->get('Origin');
+			if (!in_array(
+                $origin,
+                $this->app['cors.options']['origins']
+            )) {
+                return;
+            }
+            
+            $response->headers->set('Access-Control-Allow-Origin', $origin);
+		} else {
+		    $response->headers->set('Access-Control-Allow-Origin', '*');
+		}
+		
         if ($this->app['cors.options']['allow_credentials']) {
             $response->headers->set('Access-Control-Allow-Credentials', 'true');
         }
